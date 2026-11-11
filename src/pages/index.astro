@@ -1,0 +1,197 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Cover from '../components/Cover.astro';
+import { site } from '../data/site';
+
+const work = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
+
+const expertise = [
+  {
+    label: '01 · Data',
+    title: 'Pipelines and modeling',
+    text: 'Batch and streaming ingestion, medallion layers, and contracts that stop bad rows before they spread.',
+    tools: ['Python', 'SQL', 'PySpark', 'Databricks', 'BigQuery', 'SQL Server', 'Postgres', 'DuckDB'],
+  },
+  {
+    label: '02 · AI',
+    title: 'LLM systems you can measure',
+    text: 'Extraction and entity resolution backed by golden sets, judges and a cost ledger, so accuracy and spend are both on the page.',
+    tools: ['Claude API', 'Evals', 'Entity resolution', 'Embeddings', 'Versioned enrichment'],
+  },
+  {
+    label: '03 · Software',
+    title: 'Shipping and operations',
+    text: 'Tests, CI, infrastructure as code and alerting. Backups get restore drills and schemas get diffed against the repository.',
+    tools: ['pytest', 'GitHub Actions', 'Terraform', 'AWS', 'Google Cloud', 'Azure', 'Linux'],
+  },
+];
+
+const highlights = [
+  {
+    pre: 'Automated ',
+    hl: '$75k of annual labor',
+    post: ' with a pipeline that reads project updates out of unstructured email and writes them to a project database.',
+    where: 'Data Engineer, JLL',
+  },
+  {
+    pre: 'Removed ',
+    hl: '80% of the noise',
+    post: ' from a network access-failure metric by working through its definition with regional engineering teams.',
+    where: 'Analytics Engineer, T-Mobile',
+  },
+  {
+    pre: 'Took reporting from weekly to ',
+    hl: 'near real-time',
+    post: ' by unifying human-labeled data and automated extraction in a medallion analytics database.',
+    where: 'Data Engineer, JLL',
+  },
+  {
+    pre: 'Automated ',
+    hl: '5 legacy processes',
+    post: ' as owner of architecture and modeling for two core pipelines landing BigQuery data in SQL Server.',
+    where: 'Data Engineer, Capgemini',
+  },
+];
+
+const certs = [
+  { name: 'Databricks Certified Data Engineer Professional', date: 'Aug 2026' },
+  { name: 'Google Cloud Professional Data Engineer', date: 'Jun 2026' },
+];
+---
+
+<Base>
+  <section class="hero wrap">
+    <p class="chip"><i class="pulse" aria-hidden="true"></i>{site.now} · {site.location}</p>
+    <h1 class="h-display">
+      Data and AI pipelines <span class="dim">that fail loudly and cost little.</span>
+    </h1>
+    <p class="hero-sub">
+      I&rsquo;m {site.name}. I replace manual, monthly processes with tested pipelines on Databricks, BigQuery and
+      AWS, and I build LLM extraction you can audit.
+    </p>
+    <div class="actions">
+      <a class="btn btn-accent" href="#work">See the work <span aria-hidden="true">↓</span></a>
+      <a class="btn" href="#contact">Get in touch</a>
+    </div>
+  </section>
+
+  <section class="section wrap" id="work">
+    <header class="sec-head reveal">
+      <p class="label">Selected work</p>
+      <p class="sec-note">Two side projects, each built under a hard $15 monthly cap. Both are in development.</p>
+    </header>
+    <div class="work-grid">
+      {
+        work.map((p) => (
+          <a class="card work-card reveal" href={`/work/${p.id}/`}>
+            <div class="cover">
+              <Cover slug={p.id} />
+            </div>
+            <div class="work-body">
+              <div class="work-top">
+                <h3>{p.data.title}</h3>
+                <span class="status">
+                  <i aria-hidden="true" />
+                  {p.data.status}
+                </span>
+              </div>
+              <p>{p.data.summary}</p>
+              <ul class="chips">
+                {p.data.stack.slice(0, 5).map((s) => (
+                  <li>{s}</li>
+                ))}
+              </ul>
+              <span class="work-link">
+                Read the case study <span aria-hidden="true">→</span>
+              </span>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <p class="h-statement reveal">
+      I look for the process someone runs by hand every month,{' '}
+      <span class="dim">then replace it with a pipeline that is tested, cheap to run and boring to operate.</span>
+    </p>
+    <dl class="facts reveal">
+      <div><dt>Based</dt><dd>{site.location}</dd></div>
+      <div><dt>Now</dt><dd>{site.now}</dd></div>
+      <div><dt>Certified</dt><dd>Databricks Data Engineer Professional, Google Cloud Professional Data Engineer</dd></div>
+    </dl>
+  </section>
+
+  <section class="section wrap" id="expertise">
+    <header class="sec-head reveal">
+      <h2 class="h-section">Data, AI and software</h2>
+      <p class="sec-note">Three disciplines with one job: reliable answers out of messy sources.</p>
+    </header>
+    <div class="exp-grid">
+      {
+        expertise.map((e) => (
+          <div class="card exp-card reveal">
+            <p class="label">{e.label}</p>
+            <h3>{e.title}</h3>
+            <p>{e.text}</p>
+            <ul class="chips">
+              {e.tools.map((t) => (
+                <li>{t}</li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="principle wrap">
+    <p class="reveal">A <em>$15 monthly budget</em> teaches more engineering than an unlimited one.</p>
+  </section>
+
+  <section class="section wrap">
+    <header class="sec-head reveal">
+      <p class="label">Results at work</p>
+    </header>
+    <ul class="highlights">
+      {
+        highlights.map((h) => (
+          <li class="reveal">
+            <blockquote>
+              {h.pre}
+              <span class="hl">{h.hl}</span>
+              {h.post}
+            </blockquote>
+            <footer>{h.where}</footer>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="section wrap about" id="about">
+    <p class="label reveal">About</p>
+    <div class="about-body reveal">
+      <p class="about-lede">
+        I&rsquo;m a data engineer in Nashville. Since 2022 I&rsquo;ve built the data behind decisions at T-Mobile, JLL
+        and now Capgemini, where I lead architecture and modeling for a national nonprofit&rsquo;s data platform.
+      </p>
+      <p>
+        Outside work I build under tight constraints on purpose. A hard cost cap forces real trade-offs, and it
+        leaves a cost line anyone can check.
+      </p>
+      <ul class="certs">
+        {
+          certs.map((c) => (
+            <li>
+              <span>{c.name}</span>
+              <span>{c.date}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</Base>

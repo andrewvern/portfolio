@@ -1,0 +1,116 @@
+---
+import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '../styles/global.css';
+import { site } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description = site.description } = Astro.props;
+const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | ${site.role}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <script is:inline>
+      // Apply the chosen theme before first paint. ?theme=name overrides and is remembered.
+      (function () {
+        var names = ['light', 'charcoal', 'black', 'ember'];
+        var t = null;
+        try {
+          t = new URLSearchParams(location.search).get('theme');
+          if (names.indexOf(t) > -1) localStorage.setItem('theme', t);
+          else t = localStorage.getItem('theme');
+        } catch (e) {}
+        document.documentElement.dataset.theme = names.indexOf(t) > -1 ? t : 'light';
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="nav mono">
+      <a class="nav-name" href="/"><i class="dot" aria-hidden="true"></i>{site.name}</a>
+      <nav aria-label="Primary">
+        <a href="/#work">Work</a>
+        <a href="/#about">About</a>
+        <a href="/#stack">Stack</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <a class="nav-cv" href={site.resume} download>Resume <span aria-hidden="true">↓</span></a>
+    </header>
+
+    <main id="main"><slot /></main>
+
+    <footer class="foot" id="contact">
+      <p class="mono foot-label">Contact</p>
+      <a class="cta" href={`mailto:${site.email}`}>
+        <span>Let&rsquo;s talk</span><span class="cta-arrow" aria-hidden="true">↗</span>
+      </a>
+      <div class="foot-grid mono">
+        <ul>
+          <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+          <li><a href={site.linkedin} rel="me noopener">LinkedIn</a></li>
+          <li><a href={site.github} rel="me noopener">GitHub</a></li>
+          <li><a href={site.resume} download>Resume (PDF)</a></li>
+        </ul>
+        <p>{site.location}</p>
+        <p>&copy; {new Date().getFullYear()} {site.name}</p>
+      </div>
+    </footer>
+
+    <!-- Temporary theme picker for comparing options. Remove with its CSS once a theme is chosen. -->
+    <div class="themes mono" role="group" aria-label="Theme options">
+      <span>Theme</span>
+      <button type="button" data-set-theme="light" style="--sw-bg:#e8e8e3;--sw-accent:#c6ff1a"><i></i>Light</button>
+      <button type="button" data-set-theme="charcoal" style="--sw-bg:#1b1b19;--sw-accent:#c6ff1a"><i></i>Charcoal</button>
+      <button type="button" data-set-theme="black" style="--sw-bg:#0a0a09;--sw-accent:#c6ff1a"><i></i>Black</button>
+      <button type="button" data-set-theme="ember" style="--sw-bg:#0c0b0a;--sw-accent:#ff5a1f"><i></i>Ember</button>
+    </div>
+
+    <!-- Temporary: link between the two versions while comparing. -->
+    <a class="vswitch mono" href="/v2/">Version B: dark studio →</a>
+
+    <script>
+      const themeButtons = document.querySelectorAll<HTMLButtonElement>('[data-set-theme]');
+      const markTheme = () =>
+        themeButtons.forEach((b) =>
+          b.setAttribute('aria-pressed', String(b.dataset.setTheme === document.documentElement.dataset.theme)),
+        );
+      themeButtons.forEach((b) =>
+        b.addEventListener('click', () => {
+          document.documentElement.dataset.theme = b.dataset.setTheme;
+          try {
+            localStorage.setItem('theme', b.dataset.setTheme ?? 'light');
+          } catch {}
+          markTheme();
+        }),
+      );
+      markTheme();
+
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) {
+              e.target.classList.add('in');
+              io.unobserve(e.target);
+            }
+          }
+        },
+        { rootMargin: '0px 0px -8% 0px' },
+      );
+      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+    </script>
+  </body>
+</html>

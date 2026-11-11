@@ -1,0 +1,212 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Pipeline from '../components/Pipeline.astro';
+import { site } from '../data/site';
+
+const work = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
+const pad = (n: number) => String(n).padStart(2, '0');
+
+const proof = [
+  { value: '$75k', label: 'Annual labor automated by an email-to-database pipeline', where: 'JLL' },
+  { value: '80%', label: 'Noise removed from a network access-failure metric', where: 'T-Mobile' },
+  { value: '7d → ~0', label: 'Reporting latency, from weekly to near real-time', where: 'JLL' },
+  { value: '5', label: 'Legacy processes automated across two core pipelines', where: 'Capgemini' },
+];
+
+const stack = [
+  {
+    name: 'Data',
+    items: ['Python', 'SQL', 'PySpark', 'Databricks', 'BigQuery', 'SQL Server', 'Postgres', 'DuckDB', 'Medallion modeling', 'Data quality and contracts'],
+  },
+  {
+    name: 'AI',
+    items: ['LLM extraction pipelines', 'Evaluation harnesses', 'Golden sets and judges', 'Entity resolution', 'Embeddings and retrieval', 'Versioned enrichment', 'Claude API'],
+  },
+  {
+    name: 'Software',
+    items: ['Git and GitHub Actions', 'pytest', 'Terraform', 'AWS', 'Google Cloud', 'Azure', 'Linux and systemd', 'Workflow orchestration'],
+  },
+];
+
+const certs = [
+  { name: 'Databricks Certified Data Engineer Professional', date: 'Aug 2026' },
+  { name: 'Google Cloud Professional Data Engineer', date: 'Jun 2026' },
+];
+---
+
+<Base>
+  <section class="hero">
+    <h1 class="display" aria-label="Data and AI Engineer">
+      <span class="line"><span>Data &amp; <mark>AI</mark></span></span>
+      <span class="line"><span>Engineer</span></span>
+    </h1>
+
+    <div class="ruler" aria-hidden="true"><i></i></div>
+
+    <div class="hero-bottom">
+      <dl class="hero-card mono">
+        <div><dt>Name</dt><dd>{site.name}</dd></div>
+        <div><dt>Based</dt><dd>{site.location}</dd></div>
+        <div><dt>Now</dt><dd>{site.now}</dd></div>
+      </dl>
+      <ul class="hero-index mono">
+        <li><b>[01]</b> Data pipelines</li>
+        <li><b>[02]</b> LLM systems and evals</li>
+        <li><b>[03]</b> Cost and reliability</li>
+      </ul>
+      <p class="hero-statement">
+        Pipelines that fail loudly, cost little and retire the spreadsheet. From medallion layers on Databricks to
+        LLM extraction you can audit.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" id="work">
+    <header class="section-head reveal">
+      <span class="mono">(01)</span>
+      <h2>Selected work<sup class="mono">{pad(work.length)}</sup></h2>
+      <p class="mono">Side projects built under hard cost caps. Both are in active development.</p>
+    </header>
+
+    <ol class="rows">
+      {
+        work.map((p, i) => (
+          <li class="reveal">
+            <a class="row" href={`/work/${p.id}/`} data-preview={p.id}>
+              <span class="row-num mono">{pad(i + 1)}</span>
+              <span class="row-main">
+                <span class="row-title">{p.data.title}</span>
+                <span class="row-desc">{p.data.summary}</span>
+              </span>
+              <span class="row-tags mono">{p.data.stack.slice(0, 4).join(' / ')}</span>
+              <span class="row-meta mono">
+                <span>{p.data.year}</span>
+                <span>{p.data.status}</span>
+              </span>
+              <span class="row-arrow" aria-hidden="true">↗</span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="preview" aria-hidden="true">
+      {
+        work.map((p) => (
+          <div class="preview-card" data-for={p.id}>
+            <p class="mono preview-title">{p.data.title} / data flow</p>
+            <Pipeline steps={p.data.pipeline} compact />
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section" id="about">
+    <header class="section-head reveal">
+      <span class="mono">(02)</span>
+      <h2>About</h2>
+    </header>
+
+    <div class="about-grid">
+      <p class="lede reveal">
+        I&rsquo;m Andrew, a data engineer in Nashville. I turn manual work into pipelines people
+        <mark>stop thinking about.</mark>
+      </p>
+      <div class="about-body reveal">
+        <p>
+          Since 2022 I&rsquo;ve built the data behind decisions at T-Mobile, JLL and now Capgemini, where I lead
+          architecture and modeling for a national nonprofit&rsquo;s data platform. The pattern repeats: find the
+          process someone runs by hand every month, then replace it with something tested and boring.
+        </p>
+        <p>
+          Outside work I build under tight constraints on purpose. A $15 monthly cloud cap forces better
+          engineering than an open budget does, and it leaves a cost line anyone can check.
+        </p>
+      </div>
+    </div>
+
+    <dl class="proof">
+      {
+        proof.map((p) => (
+          <div class="reveal">
+            <dt>{p.value}</dt>
+            <dd>
+              {p.label}
+              <span class="mono">{p.where}</span>
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
+  <section class="section" id="stack">
+    <header class="section-head reveal">
+      <span class="mono">(03)</span>
+      <h2>Stack</h2>
+    </header>
+
+    <div class="stack-grid">
+      {
+        stack.map((g, i) => (
+          <div class="stack-col reveal">
+            <h3>
+              <span class="mono">{pad(i + 1)}</span>
+              {g.name}
+            </h3>
+            <ul class="mono">
+              {g.items.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+
+    <ul class="certs mono reveal">
+      {
+        certs.map((c) => (
+          <li>
+            <span class="tag">Certified</span>
+            <span>{c.name}</span>
+            <span>{c.date}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <script>
+    const preview = document.querySelector<HTMLElement>('.preview');
+    const rows = document.querySelector<HTMLElement>('.rows');
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    if (preview && rows && fine) {
+      const cards = preview.querySelectorAll<HTMLElement>('.preview-card');
+
+      rows.addEventListener('pointermove', (e) => {
+        const w = preview.offsetWidth;
+        const h = preview.offsetHeight;
+        const x = Math.min(e.clientX + 24, window.innerWidth - w - 16);
+        const y = Math.min(Math.max(e.clientY - h / 2, 16), window.innerHeight - h - 16);
+        preview.style.transform = `translate(${x}px, ${y}px)`;
+        preview.classList.toggle('show', !!(e.target as Element).closest('.row'));
+      });
+
+      // Scrolling moves rows out from under a still pointer without firing pointerleave.
+      window.addEventListener('scroll', () => preview.classList.remove('show'), { passive: true });
+
+      rows.querySelectorAll<HTMLElement>('.row').forEach((row) => {
+        row.addEventListener('pointerenter', () => {
+          cards.forEach((c) => c.classList.toggle('on', c.dataset.for === row.dataset.preview));
+          preview.classList.add('show');
+        });
+      });
+
+      rows.addEventListener('pointerleave', () => preview.classList.remove('show'));
+    }
+  </script>
+</Base>

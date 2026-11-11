@@ -1,0 +1,19 @@
+---
+interface Props {
+  steps: { label: string; note?: string }[];
+  compact?: boolean;
+}
+const { steps, compact = false } = Astro.props;
+---
+
+<ol class:list={['pipe', { compact }]}>
+  {
+    steps.map((s, i) => (
+      <li>
+        <span class="pipe-n mono">{String(i + 1).padStart(2, '0')}</span>
+        <span class="pipe-label">{s.label}</span>
+        {s.note && <span class="pipe-note mono">{s.note}</span>}
+      </li>
+    ))
+  }
+</ol>

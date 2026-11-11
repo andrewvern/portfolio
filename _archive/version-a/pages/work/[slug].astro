@@ -1,0 +1,88 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Pipeline from '../../components/Pipeline.astro';
+
+export async function getStaticPaths() {
+  const work = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
+  return work.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, index: i, total: work.length, next: work[(i + 1) % work.length] },
+  }));
+}
+
+const { entry, index, total, next } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<Base title={d.title} description={d.summary}>
+  <article class="case">
+    <header class="case-head">
+      <p class="mono case-crumb">
+        <a href="/#work">← Index</a>
+        <span>{pad(index + 1)} / {pad(total)}</span>
+      </p>
+      <h1 class="display case-title">
+        <span class="line"><span>{d.title}</span></span>
+      </h1>
+      <p class="case-summary">{d.summary}</p>
+    </header>
+
+    <dl class="case-meta mono">
+      <div><dt>Role</dt><dd>{d.role}</dd></div>
+      <div><dt>Year</dt><dd>{d.year}</dd></div>
+      <div>
+        <dt>Status</dt>
+        <dd><i class="dot" aria-hidden="true"></i>{d.status}</dd>
+      </div>
+      <div><dt>Stack</dt><dd>{d.stack.join(', ')}</dd></div>
+      {
+        d.links.length > 0 && (
+          <div>
+            <dt>Links</dt>
+            <dd>
+              {d.links.map((l) => (
+                <a href={l.href} rel="noopener">
+                  {l.label} ↗
+                </a>
+              ))}
+            </dd>
+          </div>
+        )
+      }
+    </dl>
+
+    <dl class="proof case-metrics">
+      {
+        d.metrics.map((m) => (
+          <div class="reveal">
+            <dt>{m.value}</dt>
+            <dd>{m.label}</dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <figure class="case-flow reveal">
+      <figcaption class="mono">Data flow</figcaption>
+      <Pipeline steps={d.pipeline} />
+    </figure>
+
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+
+  {
+    total > 1 && (
+      <a class="next" href={`/work/${next.id}/`}>
+        <span class="mono">Next project</span>
+        <span class="next-title">
+          {next.data.title} <span aria-hidden="true">↗</span>
+        </span>
+      </a>
+    )
+  }
+</Base>

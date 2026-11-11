@@ -1,0 +1,82 @@
+---
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
+import '../styles/global.css';
+import { site } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description = site.description } = Astro.props;
+const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | ${site.role}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="nav">
+      <div class="wrap nav-inner">
+        <a class="brand" href="/">
+          <span class="brand-mark" aria-hidden="true">AV</span>
+          <span>{site.name}</span>
+        </a>
+        <nav aria-label="Primary">
+          <a href="/#work">Work</a>
+          <a href="/#expertise">Expertise</a>
+          <a href="/#about">About</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <a class="btn btn-sm" href={site.resume} download>Resume <span aria-hidden="true">↓</span></a>
+      </div>
+    </header>
+
+    <main id="main"><slot /></main>
+
+    <footer class="foot wrap" id="contact">
+      <div class="contact reveal">
+        <p class="label">Contact</p>
+        <h2 class="h-display">
+          Working on a data or AI platform? <span class="dim">I&rsquo;d like to hear about it.</span>
+        </h2>
+        <div class="actions">
+          <a class="btn btn-accent" href={`mailto:${site.email}`}>{site.email}</a>
+          <a class="btn" href={site.linkedin} rel="me noopener">LinkedIn <span aria-hidden="true">↗</span></a>
+          <a class="btn" href={site.github} rel="me noopener">GitHub <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+      <div class="foot-row">
+        <span>&copy; {new Date().getFullYear()} {site.name}</span>
+        <span>{site.location}</span>
+      </div>
+    </footer>
+
+    <script>
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) {
+              e.target.classList.add('in');
+              io.unobserve(e.target);
+            }
+          }
+        },
+        { rootMargin: '0px 0px -8% 0px' },
+      );
+      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+    </script>
+  </body>
+</html>

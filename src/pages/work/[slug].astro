@@ -1,0 +1,95 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Cover from '../../components/Cover.astro';
+
+export async function getStaticPaths() {
+  const work = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
+  return work.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, total: work.length, next: work[(i + 1) % work.length] },
+  }));
+}
+
+const { entry, total, next } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+---
+
+<Base title={d.title} description={d.summary}>
+  <article>
+    <header class="case-hero wrap">
+      <a class="back" href="/#work">← All work</a>
+      <p class="chip"><i class="pulse" aria-hidden="true"></i>{d.status} · {d.year}</p>
+      <h1 class="h-display">{d.title}</h1>
+      <p class="case-sub">{d.summary}</p>
+    </header>
+
+    <div class="wrap">
+      <div class="cover cover-lg reveal">
+        <Cover slug={entry.id} />
+      </div>
+
+      <dl class="meta">
+        <div><dt>Role</dt><dd>{d.role}</dd></div>
+        <div><dt>Year</dt><dd>{d.year}</dd></div>
+        <div><dt>Stack</dt><dd>{d.stack.join(', ')}</dd></div>
+        <div>
+          <dt>Links</dt>
+          <dd>
+            {d.links.length > 0 ? d.links.map((l) => <a href={l.href} rel="noopener">{l.label} ↗</a>) : 'Repository not public yet'}
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <section class="section wrap">
+      <dl class="metric-grid">
+        {
+          d.metrics.map((m) => (
+            <div class="card metric reveal">
+              <dt>{m.value}</dt>
+              <dd>{m.label}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+
+    <section class="wrap">
+      <header class="sec-head reveal">
+        <p class="label">Data flow</p>
+      </header>
+      <ol class="flow reveal">
+        {
+          d.pipeline.map((s) => (
+            <li>
+              <b>{s.label}</b>
+              {s.note && <span>{s.note}</span>}
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="section wrap">
+      <div class="prose">
+        <Content />
+      </div>
+    </section>
+  </article>
+
+  {
+    total > 1 && (
+      <div class="wrap">
+        <a class="card next-card reveal" href={`/work/${next.id}/`}>
+          <span>
+            <span class="label">Next project</span>
+            <b>{next.data.title}</b>
+          </span>
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    )
+  }
+</Base>

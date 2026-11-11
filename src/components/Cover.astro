@@ -1,0 +1,97 @@
+---
+// Generated cover art per project. Swap for real screenshots once the dashboards exist.
+interface Props {
+  slug: string;
+}
+const { slug } = Astro.props;
+
+// Onchain: a chain of blocks, filled up to the finalized head.
+const cols = 16;
+const rows = 7;
+const size = 26;
+const gap = 9;
+const x0 = (640 - (cols * size + (cols - 1) * gap)) / 2;
+const y0 = 78;
+const head = 88;
+const blocks = Array.from({ length: cols * rows }, (_, i) => {
+  const shade = 0.1 + (((i * 37) % 11) / 11) * 0.16;
+  return {
+    x: x0 + (i % cols) * (size + gap),
+    y: y0 + Math.floor(i / cols) * (size + gap),
+    state: i < head - 6 ? 'done' : i <= head ? 'fresh' : 'ahead',
+    shade,
+    glow: 0.3 + ((i - (head - 6)) / 6) * 0.7,
+  };
+});
+const headBlock = blocks[head];
+
+// EDGAR: prose lines on the left, typed fields on the right.
+const lines = [150, 196, 172, 118, 188, 160, 196, 134, 180, 96];
+const picks = [
+  { line: 1, x: 96, w: 84, label: 'event_type' },
+  { line: 3, x: 72, w: 70, label: 'counterparty' },
+  { line: 6, x: 150, w: 62, label: 'amount' },
+  { line: 8, x: 84, w: 76, label: 'effective_date' },
+];
+const lineY = (i: number) => 112 + i * 24;
+---
+
+{
+  slug === 'onchain-indexer' ? (
+    <svg viewBox="0 0 640 400" role="img" aria-label="Grid of blocks filled up to the finalized head">
+      <text x={x0} y="52" class="c-label">eth_getLogs → bronze → silver → gold</text>
+      {blocks.map((b) =>
+        b.state === 'ahead' ? (
+          <rect x={b.x + 0.5} y={b.y + 0.5} width={size - 1} height={size - 1} rx="6" fill="none" stroke="rgba(255,255,255,0.1)" />
+        ) : b.state === 'fresh' ? (
+          <rect x={b.x} y={b.y} width={size} height={size} rx="6" fill="#c6ff1a" opacity={b.glow} />
+        ) : (
+          <rect x={b.x} y={b.y} width={size} height={size} rx="6" fill="#ffffff" opacity={b.shade} />
+        ),
+      )}
+      <path d={`M${headBlock.x + size / 2} ${headBlock.y + size + 6} v 78`} stroke="#c6ff1a" stroke-width="1" />
+      <text x={headBlock.x + size / 2 + 10} y={headBlock.y + size + 86} class="c-label c-accent">finalized head</text>
+    </svg>
+  ) : (
+    <svg viewBox="0 0 640 400" role="img" aria-label="Filing text with highlighted phrases mapped to typed fields">
+      <rect x="48" y="44" width="256" height="312" rx="12" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" />
+      <text x="72" y="82" class="c-label">FORM 8-K / ITEM 1.01</text>
+      {lines.map((w, i) => (
+        <rect x="72" y={lineY(i)} width={w} height="8" rx="4" fill="#ffffff" opacity="0.13" />
+      ))}
+      {picks.map((p, i) => {
+        const y = lineY(p.line) + 4;
+        const ty = 86 + i * 76;
+        return (
+          <g>
+            <rect x={p.x} y={y - 6} width={p.w} height="12" rx="6" fill="#c6ff1a" />
+            <path
+              d={`M${p.x + p.w} ${y} C ${330} ${y}, ${330} ${ty + 22}, ${384} ${ty + 22}`}
+              fill="none"
+              stroke="#c6ff1a"
+              stroke-opacity="0.45"
+            />
+            <rect x="384" y={ty} width="208" height="44" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" />
+            <circle cx="404" cy={ty + 22} r="4" fill="#c6ff1a" />
+            <text x="420" y={ty + 26} class="c-label c-field">{p.label}</text>
+          </g>
+        );
+      })}
+    </svg>
+  )
+}
+
+<style>
+  .c-label {
+    font-family: var(--mono);
+    font-size: 12px;
+    fill: #8b8b87;
+  }
+  .c-accent {
+    fill: #c6ff1a;
+  }
+  .c-field {
+    fill: #c4c4c0;
+    font-size: 13px;
+  }
+</style>
