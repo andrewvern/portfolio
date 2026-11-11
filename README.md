@@ -10,6 +10,17 @@ npm run dev      # http://localhost:4321
 npm run build    # static output in dist/
 ```
 
+## Deploy
+
+Hosted on Cloudflare Pages, project `andrewvernon`: https://andrewvernon.pages.dev
+
+Deploys are manual uploads of the build output; pushing to GitHub does not deploy.
+
+```sh
+npm run build
+npx wrangler pages deploy dist --project-name andrewvernon --branch main
+```
+
 ## Structure
 
 - `src/pages/index.astro`: home page
